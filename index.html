@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taste or Hate — Smak czy porażka?</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            taste: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              600: '#059669',
+              700: '#047857',
+            },
+            hate: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              600: '#e11d48',
+              700: '#be123c',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Płynne przewijanie i subtelne style dla treści wpisów z Bloggera */
+    html {
+      scroll-behavior: smooth;
+    }
+    .post-prose img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+      margin: 1rem auto;
+      display: block;
+      box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.12);
+    }
+    .post-prose iframe {
+      max-width: 100%;
+      border-radius: 0.75rem;
+      margin-top: 1.25rem;
+    }
+    .post-prose a {
+      color: #047857;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      word-break: break-word;
+    }
+    .post-prose ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    .post-prose p {
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-amber-200 selection:text-stone-900">
+
+  <!-- Pasek informacyjny o tymczasowych zdjęciach z Bloggera -->
+  <div class="bg-amber-950 text-amber-100 text-xs sm:text-sm py-2 px-4 border-b border-amber-800/60">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-amber-400/20 text-amber-200 border border-amber-400/30">
+          Tymczasowe zdjęcia Blogger
+        </span>
+        <span>Podgląd korzysta z zewnętrznych adresów Bloggera — docelowo podmienimy je na pliki w repozytorium GitHuba.</span>
+      </div>
+      <button
+        id="openManagerTopBtn"
+        type="button"
+        class="underline font-medium text-amber-200 hover:text-white transition cursor-pointer"
+      >
+        Zarządzaj wpisami i statystykami
+      </button>
+    </div>
+  </div>
+
+  <!-- Nawigacja -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-stone-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="#top" class="flex items-center gap-2.5 group">
+        <span class="w-9 h-9 rounded-xl bg-stone-900 text-white flex items-center justify-center font-extrabold text-sm tracking-tight group-hover:bg-stone-800 transition">
+          T/H
+        </span>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight text-stone-900">Taste or Hate</span>
+          <span class="hidden sm:inline-block ml-2 text-xs text-stone-500 font-medium">archiwum &amp; głosowanie</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-stone-600">
+        <a href="#wpisy" class="hover:text-stone-900 transition">Wpisy</a>
+        <a href="#o-blogu" class="hover:text-stone-900 transition">O projekcie</a>
+        <a href="#kontakt" class="hover:text-stone-900 transition">Kontakt</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button
+          id="openNewPostBtn"
+          type="button"
+          class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-stone-900 text-white hover:bg-stone-800 transition shadow-sm cursor-pointer"
+        >
+          + Nowy wpis
+        </button>
+        <button
+          id="openManagerBtn"
+          type="button"
+          class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-stone-100 text-stone-800 hover:bg-stone-200 border border-stone-200 transition cursor-pointer"
+        >
+          Edycja / JSON
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sekcja Hero -->
+  <section id="top" class="relative overflow-hidden bg-white border-b border-stone-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-7 space-y-5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-xs font-medium text-stone-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Migracja z Bloggera na GitHub Pages • Oryginalne daty zachowane</span>
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-stone-900 leading-[1.12]">
+            Kuchnia, eksperymenty i <span class="text-emerald-700">Taste</span> albo <span class="text-rose-600">Hate</span>.
+          </h1>
+          <p class="text-base sm:text-lg text-stone-600 max-w-2xl leading-relaxed">
+            Od śledzi dziadka Zbyszka i gofrów ze śledzikiem, przez piwny ser w Pradze, po pizzę neapolitańską i modyfikacje piecyka G3Ferrari. Tu sprawdzisz każdy wpis, oddasz głos oraz łatwo dodasz, poprawisz lub usuniesz pozycje.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <a
+              href="#wpisy"
+              class="px-5 py-3 rounded-xl bg-stone-900 text-white text-sm font-semibold hover:bg-stone-800 transition shadow-sm"
+            >
+              Przeglądaj wpisy
+            </a>
+            <button
+              id="resetDemoDataBtn"
+              type="button"
+              class="px-4 py-3 rounded-xl bg-white text-stone-700 text-sm font-medium border border-stone-300 hover:bg-stone-50 transition cursor-pointer"
+            >
+              Przywróć stan startowy
+            </button>
+          </div>
+        </div>
+
+        <!-- Podsumowanie statystyk -->
+        <div class="lg:col-span-5">
+          <div class="rounded-2xl bg-stone-900 text-white p-6 sm:p-7 shadow-lg border border-stone-800 space-y-5">
+            <div class="flex items-center justify-between border-b border-stone-800 pb-4">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-stone-400 font-semibold">Statystyki bloga</p>
+                <p class="text-xl font-bold mt-0.5">Podsumowanie głosów</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                Edytowalne
+              </span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 text-center">
+              <div class="rounded-xl bg-stone-800/80 p-3.5 border border-stone-700/60">
+                <div id="statPostsCount" class="text-2xl font-extrabold text-white">0</div>
+                <div class="text-xs text-stone-400 mt-0.5">Wpisów</div>
+              </div>
+              <div class="rounded-xl bg-emerald-950/70 p-3.5 border border-emerald-800/50">
+                <div id="statTotalTaste" class="text-2xl font-extrabold text-emerald-400">0</div>
+                <div class="text-xs text-emerald-200/80 mt-0.5">Taste</div>
+              </div>
+              <div class="rounded-xl bg-rose-950/70 p-3.5 border border-rose-800/50">
+                <div id="statTotalHate" class="text-2xl font-extrabold text-rose-400">0</div>
+                <div class="text-xs text-rose-200/80 mt-0.5">Hate</div>
+              </div>
+            </div>
+
+            <p class="text-xs text-stone-400 leading-relaxed">
+              Każdy wpis ma własne liczniki <strong class="text-emerald-300">Taste</strong> i <strong class="text-rose-300">Hate</strong>. Głosy zapisują się lokalnie w przeglądarce, a w panelu <em>Edycja / JSON</em> możesz ręcznie ustawić dowolne wartości i skopiować gotowy kod do pliku danych na GitHubie.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filtry i siatka wpisów -->
+  <main id="wpisy" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900">Wpisy i galerie</h2>
+        <p class="text-sm text-stone-600 mt-1">Kliknij kartę lub „Czytaj więcej”, aby otworzyć pełny wpis i galerię zdjęć.</p>
+      </div>
+
+      <!-- Wyszukiwarka i sortowanie -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Szukaj po tytule, kategorii, treści..."
+            class="w-full sm:w-64 px-4 py-2.5 rounded-xl bg-white border border-stone-300 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900/15 focus:border-stone-500"
+          />
+        </div>
+        <select
+          id="sortSelect"
+          aria-label="Sortowanie wpisów"
+          class="px-3.5 py-2.5 rounded-xl bg-white border border-stone-300 text-sm font-medium text-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-900/15"
+        >
+          <option value="date-desc">Data: od najnowszych</option>
+          <option value="date-asc">Data: od najstarszych</option>
+          <option value="taste-desc">Najwięcej głosów Taste</option>
+          <option value="hate-desc">Najwięcej głosów Hate</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Pasek kategorii -->
+    <div id="categoryBar" class="flex flex-wrap items-center gap-2 mb-8"></div>
+
+    <!-- Informacja o wynikach -->
+    <div id="resultsInfo" class="text-xs font-medium text-stone-500 mb-5"></div>
+
+    <!-- Siatka wpisów -->
+    <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    <!-- Pusty stan -->
+    <div id="emptyState" class="hidden rounded-2xl bg-white border border-stone-200 p-10 text-center space-y-3">
+      <p class="text-lg font-bold text-stone-800">Brak wpisów spełniających kryteria</p>
+      <p class="text-sm text-stone-500">Zmień frazę wyszukiwania lub wybierz inną kategorię.</p>
+      <button
+        id="clearFiltersBtn"
+        type="button"
+        class="px-4 py-2 rounded-xl bg-stone-900 text-white text-sm font-semibold hover:bg-stone-800 transition cursor-pointer"
+      >
+        Wyczyść filtry
+      </button>
+    </div>
+  </main>
+
+  <!-- Sekcja O projekcie -->
+  <section id="o-blogu" class="bg-white border-t border-b border-stone-200/80 py-14">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-6 space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">O projekcie</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900">
+          Własna przestrzeń zamiast sztywnego szablonu Bloggera
+        </h2>
+        <p class="text-stone-600 leading-relaxed">
+          Wszystkie dotychczasowe wpisy zachowują swoje oryginalne daty publikacji oraz tagi. Zdjęcia w tym podglądzie wskazują jeszcze na serwery Bloggera, aby można było szybko obejrzeć układ strony — docelowo przeniesiemy je do katalogu <code class="px-1.5 py-0.5 rounded bg-stone-100 text-stone-800 text-xs">assets/images/</code> w repozytorium GitHuba.
+        </p>
+      </div>
+      <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="rounded-2xl bg-stone-50 border border-stone-200 p-5 space-y-1.5">
+          <h3 class="font-bold text-stone-900">1. Tymczasowe zdjęcia Blogger</h3>
+          <p class="text-sm text-stone-600">
+            Każde zdjęcie ma awaryjny podgląd zastępczy, gdyby zewnętrzny serwer odpowiedział wolniej lub zablokował połączenie.
+          </p>
+        </div>
+        <div class="rounded-2xl bg-stone-50 border border-stone-200 p-5 space-y-1.5">
+          <h3 class="font-bold text-stone-900">2. Pełna kontrola nad wpisami</h3>
+          <p class="text-sm text-stone-600">
+            Możesz dodawać nowe wpisy, edytować istniejące, usuwać zbędne oraz ręcznie modyfikować liczniki Taste / Hate.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sekcja Kontakt / Newsletter -->
+  <section id="kontakt" class="py-14">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="rounded-2xl bg-stone-900 text-white p-7 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 space-y-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Kontakt &amp; nowości</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Masz pomysł na Taste or Hate?</h2>
+          <p class="text-stone-300 text-sm sm:text-base leading-relaxed">
+            Zostaw wiadomość lub zapisz się na powiadomienia o nowych kulinarnych eksperymentach i wpisach na blogu.
+          </p>
+        </div>
+        <div class="lg:col-span-6">
+          <form id="contactForm" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                type="text"
+                name="name"
+                required
+                placeholder="Twoje imię lub nick"
+                class="w-full px-4 py-2.5 rounded-xl bg-stone-800 border border-stone-700 text-sm text-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+              />
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="Twój e-mail"
+                class="w-full px-4 py-2.5 rounded-xl bg-stone-800 border border-stone-700 text-sm text-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+              />
+            </div>
+            <textarea
+              name="message"
+              rows="2"
+              placeholder="Co przetestować albo ocenić jako Taste or Hate?"
+              class="w-full px-4 py-2.5 rounded-xl bg-stone-800 border border-stone-700 text-sm text-white placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+            ></textarea>
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <button
+                type="submit"
+                class="px-5 py-2.5 rounded-xl bg-amber-400 text-stone-950 text-sm font-bold hover:bg-amber-300 transition cursor-pointer"
+              >
+                Wyślij wiadomość
+              </button>
+              <span id="contactStatus" class="text-xs text-emerald-300 font-medium"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stopka -->
+  <footer class="border-t border-stone-200 bg-white py-8 text-sm text-stone-600">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <strong class="text-stone-900">Taste or Hate</strong> — przygotowane pod repozytorium GitHub. Zdjęcia tymczasowe z Bloggera do późniejszej podmiany.
+      </div>
+      <div class="flex items-center gap-5 text-xs sm:text-sm">
+        <a href="#top" class="hover:text-stone-900 transition">Do góry</a>
+        <a href="#wpisy" class="hover:text-stone-900 transition">Wpisy</a>
+        <a href="#kontakt" class="hover:text-stone-900 transition">Kontakt</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal podglądu pełnego wpisu -->
+  <div id="postModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/70 backdrop-blur-xs p-3 sm:p-6" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-stone-200 overflow-hidden">
+      <div class="px-5 sm:px-7 py-4 border-b border-stone-200 flex items-start justify-between gap-4 bg-stone-50">
+        <div>
+          <div id="modalMeta" class="text-xs font-medium text-stone-500 mb-1"></div>
+          <h3 id="modalTitle" class="text-xl sm:text-2xl font-extrabold text-stone-900 leading-snug"></h3>
+        </div>
+        <button
+          id="closePostModalBtn"
+          type="button"
+          class="p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 transition cursor-pointer"
+          aria-label="Zamknij wpis"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div id="modalBody" class="p-5 sm:p-7 overflow-y-auto space-y-6">
+        <div id="modalGallery" class="space-y-3"></div>
+        <div id="modalContent" class="post-prose text-stone-800 text-sm sm:text-base leading-relaxed"></div>
+      </div>
+
+      <div id="modalFooter" class="px-5 sm:px-7 py-4 border-t border-stone-200 bg-stone-50 flex flex-wrap items-center justify-between gap-3"></div>
+    </div>
+  </div>
+
+  <!-- Modal dodawania / edycji wpisu -->
+  <div id="editorModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/70 backdrop-blur-xs p-3 sm:p-6" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-stone-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+        <h3 id="editorModalTitle" class="text-lg sm:text-xl font-extrabold text-stone-900">Nowy wpis</h3>
+        <button
+          id="closeEditorModalBtn"
+          type="button"
+          class="p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 transition cursor-pointer"
+          aria-label="Zamknij formularz wpisu"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form id="postForm" class="p-6 overflow-y-auto space-y-4">
+        <input type="hidden" id="editPostId" />
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Tytuł wpisu *</label>
+          <input
+            id="postTitleInput"
+            type="text"
+            required
+            placeholder="np. Śledź w majonezie z kaparami"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/15"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Data publikacji *</label>
+            <input
+              id="postDateInput"
+              type="datetime-local"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/15"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Kategorie (oddzielone przecinkiem)</label>
+            <input
+              id="postCategoriesInput"
+              type="text"
+              placeholder="np. Śledźik, Przekąska"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/15"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Liczba głosów Taste</label>
+            <input
+              id="postTasteInput"
+              type="number"
+              min="0"
+              value="0"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50/40 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/25"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-rose-700 mb-1">Liczba głosów Hate</label>
+            <input
+              id="postHateInput"
+              type="number"
+              min="0"
+              value="0"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-rose-300 bg-rose-50/40 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500/25"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">
+            Adresy zdjęć (po jednym URL w linii — tymczasowo z Bloggera lub docelowo z repozytorium)
+          </label>
+          <textarea
+            id="postImagesInput"
+            rows="3"
+            placeholder="https://blogger.googleusercontent.com/..."
+            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-stone-900/15"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">
+            Treść wpisu (zwykły tekst lub HTML) *
+          </label>
+          <textarea
+            id="postBodyInput"
+            rows="7"
+            required
+            placeholder="Napisz przepis, historię lub wklej fragment HTML..."
+            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/15"
+          ></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3 border-t border-stone-100">
+          <button
+            id="cancelEditorBtn"
+            type="button"
+            class="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200 transition cursor-pointer"
+          >
+            Anuluj
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-stone-900 text-white text-sm font-semibold hover:bg-stone-800 transition cursor-pointer"
+          >
+            Zapisz wpis
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal menedżera wpisów, statystyk i eksportu JSON -->
+  <div id="managerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/70 backdrop-blur-xs p-3 sm:p-6" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-stone-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+        <div>
+          <h3 class="text-lg sm:text-xl font-extrabold text-stone-900">Zarządzanie wpisami, statystykami i eksportem</h3>
+          <p class="text-xs text-stone-500">Edytuj statystyki Taste/Hate, poprawiaj lub usuwaj wpisy albo pobierz JSON dla repozytorium.</p>
+        </div>
+        <button
+          id="closeManagerModalBtn"
+          type="button"
+          class="p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-200/70 transition cursor-pointer"
+          aria-label="Zamknij menedżer"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <button
+            id="managerAddPostBtn"
+            type="button"
+            class="px-4 py-2 rounded-xl bg-stone-900 text-white text-sm font-semibold hover:bg-stone-800 transition cursor-pointer"
+          >
+            + Dodaj nowy wpis
+          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              id="copyJsonBtn"
+              type="button"
+              class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs sm:text-sm font-semibold hover:bg-emerald-100 transition cursor-pointer"
+            >
+              Kopiuj JSON
+            </button>
+            <button
+              id="downloadJsonBtn"
+              type="button"
+              class="px-3.5 py-2 rounded-xl bg-stone-100 text-stone-800 border border-stone-300 text-xs sm:text-sm font-semibold hover:bg-stone-200 transition cursor-pointer"
+            >
+              Pobierz posts.json
+            </button>
+          </div>
+        </div>
+        <div id="managerActionNotice" class="text-xs font-medium text-emerald-700"></div>
+
+        <!-- Lista wpisów z szybką edycją głosów i usuwaniem -->
+        <div id="managerPostsList" class="divide-y divide-stone-200 border border-stone-200 rounded-2xl overflow-hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dane wpisów z tymczasowymi adresami zdjęć z Bloggera -->
+  <script>
+    /**
+     * Łatwy do podmiany zestaw wpisów Taste or Hate.
+     * Zdjęcia wskazują tymczasowo na serwery Bloggera (blogger.googleusercontent.com),
+     * aby można było przetestować widok przed przeniesieniem plików do repozytorium GitHuba.
+     */
+    const INITIAL_POSTS = [
+      {
+        id: 'post-6',
+        slug: 'do-tradycyjny-led-z-cebulk',
+        title: 'Dość tradycyjny śledź z cebulką',
+        published: '2020-04-23T16:51:00.006Z',
+        categories: ['Śledźik'],
+        images: [],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Potrzebować będziemy:</p><p>- paczka śledzi<br>- garnek z wodą (zimną!)<br>- duża cebula lub dwie małe<br>- olej (mam zapisane na kartce "Rino", ale google nie zna)<br>- słoik zakręcany</p><p>Śledzie przez dwie godziny moczymy w garnku/misce z wodą, następnie osuszamy na ręczniku papierowym. Rybę kroimy w 2-3cm kawałki. Cebulkę kroimy w drobniutką kostkę. Układamy warstwami śledzia na przemian z cebulką w słoiku podlewając olejem. Zamykamy słoik i wkładamy do lodówki na noc. Co bardziej niecierpliwi mogą podjadać, ale lepiej smakuje jak się "przegryzie". Można urozmaicić dodając ulubione dodatki - może być zielony pieprz, kapary, żurawina, rodzynki, orzechy... A może jakieś propozycje?</p></div>'
+      },
+      {
+        id: 'post-14',
+        slug: 'led-w-mietanie-dziadka-zbyszka',
+        title: 'Śledź w śmietanie dziadka Zbyszka',
+        published: '2020-04-23T16:57:00.006Z',
+        categories: ['śledź w śmietanie', 'jabłka', 'Śledźik', 'śledź'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEggOQDE9NNxk84l8RvMzZJjPoCyciJDlbfxi2Caeirhwqqjvuzrfe-zbqDvvfWQ_pSzwkjrundgbOzQwq1bkb8QHqU8STSEd_p_OZGmjTa3iBfujjNBvcM6T-RgF4RJO5E6uksc1YAqb2ll/w640-h435/1617021253514054-0.png',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1Zaod6TQegTv-s6Ny5wRZPLPeeJ6kcoIBZeVMO-eP-v9mgX06506IryHGb5vdIQcjiNwWKujFs3uak7fayXIhOILvdUWz-Iy4RCHepiNkbviJfz2LmIJzF4uJXNJRlyqyL0R8zjgbKKmP/w386-h400/1617021250192838-1.png',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6VZHx2tbPQd1Qqlu98X-i55kN-2uFj8lmc8z5DE4PxKtGnWWL17o0dZ8mzDEpSiqTUaoCTk3ocXXursF8gYwLiJGRSHdDSIJEAlau4ERWmbWHCZHNYnATpqskipoeLY1PQCO9iGi2JfMB/s1600/1617021246826002-2.png',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhfp6YhjmvbFF4cDsbDv8kmFkSkpCdFP1bGkePc0kpxHCXLtAnyV3YRKKuQz1yqRbwmKZhzgty6yAZ3zIDbpAPW-Sf-2DDmJI-83SHnVPL6MZv484AOg7TCm9MnLNvnwjr8eHwRzgboQYnk/s1600/1617021243589257-3.png',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjcKg-V8UJA12jlzTjbQMj0WIqX2Vtc5BhebS8stYewQ1h_JgIXdpgaq9NUFQOi3CBp8A7aiLlSsrBdAbcd8hUcHKRKWLOx5C9Z3_eBKhvcXlNderJZITkXNJx70HjYJ6ByKs2EwS9VT9CH/w640-h394/1617021240217348-4.png'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Potrzebujemy:<br>- paczka śledzi w solance<br>- garnek z wodą (zimną!)<br>- duża cebula lub dwie małe<br>- pół cytryny<br>- ocet (1 łyżka)<br>- cukier (1 łyżka płaska)<br>- sól (1/2 łyżki płaskiej)<br>- pieprz wg uznania<br>- spore jabłko<br>- śmietana 100ml (mam napisane min. 24%, więc dajemy 100g 18% i 100g 30%)</p><p>Śledzie przez dwie godziny moczymy w garnku/misce z wodą, następnie osuszamy na ręczniku papierowym. Rybę kroimy w 2-3cm kawałki.</p><p>Gwóźdź programu, sos: cebulę kroimy w drobniutką kostkę. Jabłko ścieramy na tarce z małymi dziurkami. Mieszamy cebulę, jabłko, sok z połowy cytryny, ocet, sól, pieprz, śmietanę.</p><p>Układamy śledzie warstwami w słoiku lub pojemniku przekładając masą. Zamykamy i wkładamy do lodówki na noc (ta wersja naprawdę powinna poczekać z konsumpcją!). Moja żona uwielbia!</p></div>'
+      },
+      {
+        id: 'post-7',
+        slug: 'gofry-ze-ledzikiem',
+        title: 'Gofry ze śledzikiem',
+        published: '2020-04-23T17:00:00.004Z',
+        categories: ['Śledźik'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6qIBG216IhmTxs_5tyzVINCkdtJNJLTV-yljcJfmepUcEOVjk_nhSQgfs6NOoA5h2C3iBo726csremtYvBxHnmucXCikBm8zCcK_VbKlFs9mvc5lbpY-8SXQy04l8Xk2acUr18bsN9sq_/s640/IMG_20200422_191809.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Tym daniem rozpoczynam prowadzenie bloga Taste or Hate. Czemu? Bo jest kontrowersyjne. Można się zasmakować i pokochać albo szczerze znienawidzić.</p><p>Proponuję najpierw przygotować śledzika. Można też oczywiście kupić ulubionego - każdy ma swoje preferencje (na zdjęciu z braku czasu jest śledź z kolendrą i kardamonem, na mój gust za dużo octu, co często się zdarza w paczkowanych produktach). I tu dochodzimy do sedna: jedni lubią bardziej octowe, drudzy mniej. Jeszcze inna osoba stwierdzi, że tylko ze śmietaną, a kolejna będzie faworyzować śledzia w buraczkach.</p><p>Teraz czas na gofry. Jedziemy po bandzie - robimy na lekko słodko. Na gofry nakładamy śledzie wg uznania. Smacznego! Wersja prosta: kupujemy gotowe gofry + gotowe śledzie i jemy :D</p><p>Po spróbowaniu (nie osądzajcie pochopnie bez przetestowania!) dajcie znać co myślicie. Czy tylko ja mam takie specyficzne podniebienie, że mi to danie smakuje? :P</p></div>'
+      },
+      {
+        id: 'post-2',
+        slug: 'pivn-s-r-s-cibulkou-ho-ic-rybi-kou-a-pivo',
+        title: 'Pivní sýr s cibulkou, hořčicí, rybičkou a pivo.',
+        published: '2020-04-24T10:14:00.003Z',
+        categories: ['Przekąska'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjpNr3VSQJpFahdsiO3uU1ChiMgdJlUh17B71lanXMYEbj_iz8-Wmtx7LCpc4Tw8sR4OV9bj3C6T6u9G7m8XeX2Th5oKyZg-YtIoxXAH5XwJKQlqnuhHqcsh6Kal-pcEY7K1yuN2bpvkmJW/s640/IMG_0397.JPG'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Trochę dziwnych rzeczy w życiu jadłem, ale ta przystawka jest w moim TOP 10.</p><p>Delegacja, hotel na przedmieściach Pragi, wieczór. Weszły przystawki. Dla kilku osób, które towarzyszyły mi tego wieczoru, sam zapach piwnego sera był nie do ogarnięcia. A na talerzu była jeszcze szprotka, musztarda, przyprawy, cebula i ciemne piwo w kieliszku.</p><p>Całość miesza się razem. Jak tatara. Razem z tym piwem. Sfermentowany ser z piwem, szprotką i cebulą. Czy to może dobrze smakować? Nie!!! Ode mnie HATE! Ale polecam spróbować, żeby się przekonać.</p></div>'
+      },
+      {
+        id: 'post-8',
+        slug: 'restauracje-czyli-przerost-formy-nad-tre-ci',
+        title: 'Restauracje ĄĘ, czyli przerost formy nad treścią',
+        published: '2020-04-25T18:35:00.001Z',
+        categories: ['Refleksje'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEghte9tWZgBA_nEVlA5SVbiQTawrUmj9uiCREhOiPtuQNxFYz1Qy0KYSNs9cVbuXqyHSdG_dxEZ1nzx4KN0nQ8BmTyeHl9uYZDYhCHBBWzEVFzJH5lu38pi9p7-IofZz2XIEyII2MwV7Lbp/s640/Best-Interior-Designers-Top-restaurant-designs-HOK-La-Cava-in-United-Arab-Emirates.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgGun0rOaDVKWPtK4b8p9Y_yEQfXx5CuJhenzoEiwX0MQyc3g775bCCCLDo48qtD3gzYb_Znhyub0SiIU7uz6f-jVT1gqv2lG1d5EEEyn36j3-of6Wt8_pZUVmezK0B1sXgB8-etQ8QiJje/s640/IMG_0861.JPG'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Lubię dobre jedzenie. Chodzę sam lub z rodziną do różnych restauracji, czasami na specjalne okazje również do takich przekraczających normalne ceny, ale oferujących w zamian naprawdę kosmiczne dania. Ten wpis jest o tych miejscach, gdzie forma potrafi przyćmić treść.</p><p>Po godzinie oczekiwania wchodzi główne danie. "Całe na biało" — dziki łosoś wędzony na zimno dymem drewna bukowego na grzance w towarzystwie pianki z białych warzyw, ekstraktu gorczycy, syberyjskiego kawioru i warzyw sezonowych. Kurtyna.</p></div>'
+      },
+      {
+        id: 'post-10',
+        slug: 'czym-zagryza-rakij',
+        title: 'Czym zagryzać Rakiję?',
+        published: '2020-04-27T18:08:00.004Z',
+        categories: ['Podróże'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjB62_uQioZCZUceoZdJbhhNxPzSHb7eDIUl8Yi9toONSoXHCvcHSyAS0V3qFdLCjH7SyFyldf9yVJDqAoGXu8Ri89SjPjFF271IgV28LZ1gu8fsz6D9TnSOLPEs3FBwpedHf0tOzoE5i7G/s640/rakija.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8EVPzO4so7JEviDyA3GmpyDPuYYJ15F_1G74_OBXQfh9vlzOwQdBAeEdBPIg4SNwkq6-7HGBxXDBqEIAwu_zqozRAyA5rCAFQb4KiW3LfRblNXHYusiwpOzLTWNKnq0IPVsrDURhJyRLg/s640/pomidor.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Jakoś specjalnie za rakiją nie przepadam. Jednak goszcząc ze znajomymi w Macedonii Płn. nie mogłem odmówić sobie przetestowania lokalnych specyfików.</p><p>Lokalne wsparcie zaproponował typową przekąskę — POMIDOR. Dojrzały, dużo miąższu, świeża biała cebula i sól. Sam pomidor pyszny, ale przy rakiji pozostanę przy zimnej coli.</p></div>'
+      },
+      {
+        id: 'post-1',
+        slug: 'tatar-eg-szs-gedre-marynowany',
+        title: 'Tatar egészségedre (marynowany)',
+        published: '2020-04-28T17:35:00.004Z',
+        categories: ['Tatar', 'Wołowina'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgdAXP7iwZRQkvo7I6kqfHht5zD4fq_6gYxoKSmE5dYaUQ6sDlrdootg5QoHn6ASx73HHrR46HkvC8eTrnt_1Wc6-ZD0i2k3jNAMxRmr1E9PndWdHfbvFvW7wCDKBbwdm26g1-ZS1pY8DjX/s640/tatar_papryka.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Tatar z wołowiny marynowany w papryce — inspiracja z węgierskiego Egeru oraz szkolenia kucharskiego.</p><p>300g polędwicy wołowej (lub udźca/ligawy), żółtko, ostra papryka mielona, ketchup, oliwa, pieprz i sól — najlepiej odstawić na noc do lodówki, aby mięso wciągnęło sok. Podajemy z ciepłymi grzankami nacieranymi czosnkiem i cebulką z musztardą oraz natką pietruszki.</p></div>'
+      },
+      {
+        id: 'post-9',
+        slug: 'pol-dwiczki-z-czekolad',
+        title: 'Polędwiczki z czekoladą',
+        published: '2020-05-02T17:52:00.006Z',
+        categories: ['Polędwiczki', 'Wieprzowina'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiRD7-VFoY3buRA0n5zQ8yD89pBm9mIlAlYLG0hYTt9-7usoLOdVnf0wI56Y8LR35ZrQS710DchpI4A9l_MP8spcb_Y_sP7CC9GCzrQ_pi_uFt_56Gks4X0SrKY25X4x5hnTQ1kFK_7lAVq/s640/IMG_20200502_155656.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgs1z67d6eAEkp_GMguZxLh4SJu6RRM1LPJMhp2l9iVIXIXzt_04ujmQj1MwZkQCfPXqal9tfV3fBVWA29dRGf4NekxmHBS80JWusKLc7SrUm2RBjDqhVNptO72xhx6HQqXK1kw4N4CFhCi/s400/IMG_20200502_155351.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEih0cG2TXsEU1W7ImwmYjpvFPRBCl61WklMJbE8OyTjweM4Srg3-V38fS1z94LZ3lxSZQ5eU0CTTOGYYnG3H2NBvQR88G0eC89voc2TZN0FmxGLWgtNQnY-UfxgZLYPMdkRILZ6eIvx7xTX/s640/IMG_20200502_155752.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Mięso z czekoladą? Czy to się może udać?! Musi! Polędwiczki wieprzowe w sosie na bazie gorzkiej czekolady 70%, czerwonego wina, konfitury śliwkowej, chilli, whisky i śmietanki.</p><p>Podane z puree zapiekanym z piekarnika oraz sałatką z rukoli, pomidorków cherry i mozzarelli. To jak będzie? Hate or Taste?</p></div>'
+      },
+      {
+        id: 'post-4',
+        slug: 'o-holender-kolendra',
+        title: 'O holender! Kolendra',
+        published: '2020-05-12T17:33:00.001Z',
+        categories: ['Kolendra'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhU9ISUWPvc4JR6lAvjvsQMvbIZbR1fw_atUSSEPqW5SwNyFpbDHIvI5PZBgC0yjGSpcCyv1dnpqtmaYs_qAUIlDybhTjSNFRGXZeV2VDLg_HoLHXALfPBeQNwgLLRYl-QhYzED9WzQnuK3/w640-h578/IMG_20200512_135419.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjBVyyQ9BK1Nsxkn-h2mYX4WDtuQu3x0kPSEm6WkihbD4r_3ny2UK_byO2d7DwU0DfF0Gb9ihi12fAgh4tvg1rg32UpPo97DfvJyvpV0atHGGsp-dsFUB0jkB5wX7IizfGJUtCpz946jrer/w568-h640/IMG_20200512_132831.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Oj ciężko mam w domu z kolendrą, oj ciężko. Jedni ją uwielbiają za świeżość i wyrazistość, inni nie mogą jej znieść.</p><p>A co jeśli ktoś doda świeżą kolendrę zamiast pietruszki do rosołu? ... mi smakowało :P</p></div>'
+      },
+      {
+        id: 'post-11',
+        slug: 'kie-burger-zero-fit-waste',
+        title: 'KiełBurger zero FIT & waste',
+        published: '2020-05-18T15:47:00.001Z',
+        categories: ['Burger', 'Kiełbasa'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEivsSh4-MJIae7F0LSOdGGLgIcjKel17_bHM_lsksifXcepyzc80PcQQLghkoNJ5WKbFaliV83QPCUFBdppgrfJ20T1Wi22Qc04h7JFy-SSUWGHRvYrOQcJ9MDbsG6kL2Hne9x9wCBE5aHA/w480-h640/kielburger.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Zero waste — wykorzystanie tego, co zostało w lodówce. Zero FIT — bo z dietą ma niewiele wspólnego.</p><p>Posiekana kiełbasa wiejska z tymiankiem i jajkiem, bułka burgerowa, sos barbecue, warkocz serowy z oscypka i prażona cebulka.</p></div>'
+      },
+      {
+        id: 'post-15',
+        slug: 'jednogarnkowa-bezwodna-pasta-z-chorizo-i-sosem-z-tych-pomidor-w-ale-z-winem',
+        title: 'Jednogarnkowa, bezwodna, pasta z chorizo i sosem z żółtych pomidorów... Ale z winem!',
+        published: '2021-02-03T18:16:00.004Z',
+        categories: ['chorizo', 'bez wody', 'pasta'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhMppnjvSV28baNa49m3H0N-ZOsKVVs_ETv0RE2OXU9c62XBafbCi7Wa1PL07UVUjWNKrlrzCiCsb5s518kqwvHVhux0Vrc2xgTauveOz1KOcjlu2Wjx3ZxgrEUV8kpsT6OcaA8TrY80_Tm/w640-h434/IMG_20210203_132119.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Makaron gotowany bezpośrednio w sosie bez dolewania wody — cały smak zostaje na miejscu, a na koniec używamy tylko jednego garnka.</p><p>Chorizo, cebula, czosnek, białe wino wytrawne, sos pomidorowy (tutaj z żółtych pomidorów), natka pietruszki i tarty parmezan.</p></div>'
+      },
+      {
+        id: 'post-13',
+        slug: 'reklama-za-kt-r-nie-dostan-z-amanego-grosza-ale-mo-e-chocia-kto-skorzysta',
+        title: 'Reklama, za którą nie dostanę złamanego grosza (ale może chociaż ktoś skorzysta :) )',
+        published: '2021-02-10T15:54:00.007Z',
+        categories: ['specjały', 'zakupy w internecie', 'lokalne sklepy'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj5mjA01_RXLk-iTCjMe7sCXH3Txkg8fc6EEljA1qu92MpREn-QBqnUu0JMYzcrVCdSp-wWU6g1xv1wbin5v4sMGwt_rTCaTtm1mFm4-Q-BG7aZhKd4NAKgx39dPnHt7K-ABL9tjTcZ1cXH/w640-h384/IMG_20200505_143319.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3cp5na_o7TfnnUIqGMuQBrIgCuN1BRoMQOTorB6oQW7rXL9JeLpBNGvxQCSPBDmXlz-qzlFde0WNJTlphRo3HmQY88QtgVpHCxBiWimzRRCav-bkeTY4uIZAWD8x2Hl4EmKeBgQbDgpYj/w640-h196/IMG_20200507_092453.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhBcLs-pxpY_30u4kXqeXAyn4Uo6sGHNVhLjiOFRWhwm8qPAwzz5_oJYY9xdVgdRliV_mhgh6eMeSkksWmWRguopn8fqkNe55r1ph_NzWigbtydMPb6HxOyyokE8xXXaZLHw_xoYiid5PLg/w640-h344/pobrane.png',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEibHiaLtlEOBW13zV10_e6EMTyS-9sii3OGF4IbSwWMYwSNMxcaQRRHo159ynPZ5JGMTWqrXu8hFvWn7wCQ8610AERjjJXP63UQD01rcs_Z7JE9EMnR9MzhdZjDwRFlYBy_hfWzTNGjVqlE/w640-h476/IMG_20201203_151807+%25281%2529.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Zestaw polecanych specjałów, przetworów rybnych, wyrobów góralskich, fermentowanych papryk oraz włoskich win — bez sponsoringu, po prostu rzeczy, które warto znać.</p></div>'
+      },
+      {
+        id: 'post-3',
+        slug: 'pizza-nowa-rodzinna-tradycja',
+        title: 'Pizza - nowa rodzinna tradycja',
+        published: '2021-04-05T09:46:00.016Z',
+        categories: ['drożdże', 'pizza'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0K2F7amplSJYAeBG3fgoQrZ2TI8bVLGbp0JRZCOfd-g5jfDvUXvm0Gg4-q28I7zfhRt1yJ1jqvl_JEpp7GGmXSBW15X-LxEsaPVUmyER40WX28jMq9PD4PjbCvm0TAgVVSviUmefQ4_qM/w640-h354/IMG_20210424_152819.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj5QPk9miLOz6-soIkkXFzQgIV7uC2-51T4Ktmmvc2MwJgfp3l89Nn38rslpEAzxJi36CBYTFb_Huo3_z6iIZWn-ZgTKWPFMFN7lMKbJi2PpILo3EJSMxXD264f6cpNG_-Lb9aB_1p5xKM4/w640-h640/IMG_20200820_135044-COLLAGE.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj7Z-vWF4ysqFXXjbrR-hxqY7yh-vA5mQurNVfROSm-l4XgK34M8r38Xo06s59oQJM4W3JjEZe-1ktfNSChqQLN52lOGvU0rJklygvjsC9aD_eiQyzxv8ZMg_c4FA366fk80IjmhLuuGo_G/w480-h640/IMG_20210122_101806.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjFefcCRkxXrR4gzwHqIBk3yLjr1Bdt3FRO-Q0Qg_8RhNqvPPCSKJlraIAZdP88HvIm0heB4KNFx85yfGmnFqsw55b9BOJUk-Jn3dJOGJ-QixYoJj8LWbF3mbKF2kNc7IiW0hyrzZFV8Qin/w640-h588/IMG_20210320_151035_2.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Rok doświadczeń, zmiana podejścia do drożdży, mąki Tipo 00, dojrzewania ciasta i wypieku w wysokiej temperaturze — od „placków z sosem” do sobotniej tradycji w domu.</p><p>W wpisie znajdziesz proporcje na ciasto, wskazówki co do fermentacji oraz dodatki w stylu Margherity, Prosciutto e funghi i Calzone.</p></div>'
+      },
+      {
+        id: 'post-12',
+        slug: 'g3ferrari-g10032-modyfikacja-pieca-kopu-kowego',
+        title: 'G3Ferrari G10032 - modyfikacja pieca kopułkowego',
+        published: '2022-01-02T21:35:00.017Z',
+        categories: ['piec kopułkowy', 'mod', 'pizza', 'G3Ferrari'],
+        images: [
+          'https://blogger.googleusercontent.com/img/a/AVvXsEi-sUGIQkwxuJ_XuFtWXrHO3je4OqMlDxFK42H431yHvPjgAz2mESMmi-LN5G7bmvWGZ-_lkpoVIUogdx_XAp5rFwemIBKwg_uQltYh-JFh4YM7huB5HgMkN-B1l5_ILCHDVItruYhhp3GnYIEY79GLBt6wEn8szMH7GuBrQBpRD8rlvfaRm4xQAobsBQ=w640-h510',
+          'https://blogger.googleusercontent.com/img/a/AVvXsEjDMWckV6nmTyYeqPKatBZ9QgUKCiyM5w_GfIzxqVBOp8PwQksvn0oENprDBHtzA65FqZde9DUJNpd1INE-XDQlxeBkMiUG7bDgjXyWEbxL2fWdopOYadJZZ5XUb4EG6gWl1GGvXxILLJBfU5Xc59X0_KJHl2YcE-MO-xot2DMBVCtpincGpDIIq0vsQg=w640-h640',
+          'https://blogger.googleusercontent.com/img/a/AVvXsEjP5_ghaUSxLjXkiyp5u7VAxw5lwjYTHhpT4qxBXjpnXa2VfSdpZvohwUoydAzIQQ2biEFLNYtp-chbLv0n8SFz7y6DBOHNeZv-4cUsWOlvxQSgT3kWJYidOefh-cUuam8JMGCkxG3lhTbEJ9zmRWMO3JROMHchBMoWuUOY0OTUzGH2UFBZrUS9MlvUpQ=w640-h640'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p><i>Wszelkie modyfikacje wykonywane są na własną odpowiedzialność.</i></p><p>Szczegółowy przewodnik krok po kroku po modyfikacji piecyka kopułkowego G3Ferrari G10032: demontaż, czyszczenie, farba wysokotemperaturowa, gięcie grzałek, izolacja termiczna, okablowanie, montaż biscotto oraz testy temperatur.</p></div>'
+      },
+      {
+        id: 'post-5',
+        slug: 'rolmopsy-wg-przepisu-dziadka-zbyszka',
+        title: 'Rolmopsy wg przepisu dziadka Zbyszka',
+        published: '2024-12-22T23:04:00Z',
+        categories: ['śledzie', 'rolmopsy', 'dziadek'],
+        images: [
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg-JQ09dFG4qk80dMhYGjobVlY3qBx2Jas23Jxmy1JvAjSqHJL3UcxKaAxRLfCEynDrjkyqxoXjDMnSGjCUgtjTzUwnSi3GUq9ywH5-l_ONEjMyT2yXfw2rGq1yWGWiKW-xdxlNuncIuO7blM0aMyQaj0w7L8oUKzsYxs26xjaDSKt5BCd6b5EtbTjhGTi8/w605-h640/PXL_20231222_175256857.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiKbtlilcNywWeEuBFfC5DEu5zNTPnldAtoXqkGZ0Hl6wjkzQkg5r3hyphenhyphenwMjfgFrsSkZd_4Xt2PG6OO_FKCUnladIDtP7Vde9BUwQkgxQDjhP1dVjs4-Xebw8f7tBPCczDLeBqH7TKtTqf_iNGWqrfmiAwrDHCebHsc-kIGYvE5-gL5BJSve5daZOWlNjRk6/w640-h482/PXL_20231222_162309810.jpg',
+          'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjikQY7j5suX_2jnToEocTfuNzoJeyrzS_rPVn3h6FMl6TfoorRn_Z5AJ0vf_dbhmf519rZh2zs97-1lBxsEnsnc8es2JAApQNXAcrsesVwND5J2k5Mg5ZhRaL7CtDAXypV7XhJW7pK2LxQHudEPLGpw5aQ4WoAa_8jrYR8wjti2tncMmqUBLIU6uSzfd1q/w640-h480/PXL_20241222_161918597.jpg'
+        ],
+        votes: { taste: 0, hate: 0 },
+        html: '<div><p>Przepis oparty na starej kartce z 2003 roku ze wskazówkami dziadka Zbyszka. Śledzie moczone w zimnej wodzie, zalewa z octu 10%, wody, cebuli, marchewki, ziela angielskiego, liścia laurowego i pieprzu.</p><p>W środku zawijamy cebulę, ogórek i paseczki marchewki, spinamy wykałaczką i odstawiamy na minimum 24 godziny, żeby smaki się przegryzły.</p></div>'
+      }
+    ];
+
+    const STORAGE_KEY = 'taste_or_hate_posts_v1';
+    const USER_VOTES_KEY = 'taste_or_hate_user_votes_v1';
+
+    let posts = [];
+    let userVotes = {};
+    let activeCategory = 'Wszystkie';
+    let searchQuery = '';
+    let sortMode = 'date-desc';
+
+    // Obrazek zastępczy w razie błędu ładowania zewnętrznego URL-a z Bloggera
+    function fallbackImageUrl(label = 'Zdjęcie tymczasowe') {
+      const safeText = encodeURIComponent(label.slice(0, 28));
+      return `https://placehold.co/800x520/f5f5f4/44403c?text=${safeText}`;
+    }
+
+    function loadState() {
+      try {
+        const savedPosts = localStorage.getItem(STORAGE_KEY);
+        posts = savedPosts ? JSON.parse(savedPosts) : structuredClone(INITIAL_POSTS);
+      } catch (err) {
+        posts = structuredClone(INITIAL_POSTS);
+      }
+
+      try {
+        const savedUserVotes = localStorage.getItem(USER_VOTES_KEY);
+        userVotes = savedUserVotes ? JSON.parse(savedUserVotes) : {};
+      } catch (err) {
+        userVotes = {};
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+        localStorage.setItem(USER_VOTES_KEY, JSON.stringify(userVotes));
+      } catch (err) {
+        console.warn('Nie udało się zapisać stanu w localStorage:', err);
+      }
+    }
+
+    function formatDatePl(isoString) {
+      const d = new Date(isoString);
+      if (Number.isNaN(d.getTime())) return isoString;
+      return d.toLocaleDateString('pl-PL', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
+
+    function toDatetimeLocalValue(isoString) {
+      const d = new Date(isoString);
+      if (Number.isNaN(d.getTime())) return '2024-12-22T23:04';
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function stripHtml(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html || '';
+      return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function slugify(text) {
+      return String(text || 'wpis')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'wpis';
+    }
+
+    function getAllCategories() {
+      const set = new Set();
+      posts.forEach((p) => (p.categories || []).forEach((c) => c && set.add(c)));
+      return ['Wszystkie', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'pl'))];
+    }
+
+    function getFilteredAndSortedPosts() {
+      const q = searchQuery.trim().toLowerCase();
+
+      const filtered = posts.filter((p) => {
+        const matchesCategory =
+          activeCategory === 'Wszystkie' ||
+          (Array.isArray(p.categories) && p.categories.includes(activeCategory));
+
+        if (!matchesCategory) return false;
+        if (!q) return true;
+
+        const haystack = [
+          p.title,
+          ...(p.categories || []),
+          stripHtml(p.html),
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        return haystack.includes(q);
+      });
+
+      return filtered.sort((a, b) => {
+        if (sortMode === 'date-asc') {
+          return new Date(a.published) - new Date(b.published);
+        }
+        if (sortMode === 'taste-desc') {
+          return (b.votes?.taste || 0) - (a.votes?.taste || 0);
+        }
+        if (sortMode === 'hate-desc') {
+          return (b.votes?.hate || 0) - (a.votes?.hate || 0);
+        }
+        return new Date(b.published) - new Date(a.published);
+      });
+    }
+
+    function voteOnPost(postId, type) {
+      const post = posts.find((p) => p.id === postId);
+      if (!post) return;
+
+      post.votes = post.votes || { taste: 0, hate: 0 };
+      const previousVote = userVotes[postId];
+
+      // Jeśli użytkownik kliknął ten sam głos ponownie, cofamy go; jeśli zmienił — przełączamy
+      if (previousVote === type) {
+        post.votes[type] = Math.max(0, (post.votes[type] || 0) - 1);
+        delete userVotes[postId];
+      } else {
+        if (previousVote && (previousVote === 'taste' || previousVote === 'hate')) {
+          post.votes[previousVote] = Math.max(0, (post.votes[previousVote] || 0) - 1);
+        }
+        post.votes[type] = (post.votes[type] || 0) + 1;
+        userVotes[postId] = type;
+      }
+
+      saveState();
+      renderAll();
+
+      // Jeśli otwarty jest modal wpisu dla tego wpisu, odśwież jego stopkę
+      const postModal = document.getElementById('postModal');
+      if (!postModal.classList.contains('hidden') && postModal.dataset.currentPostId === postId) {
+        renderPostModalFooter(post);
+      }
+    }
+
+    function renderStats() {
+      const totalTaste = posts.reduce((acc, p) => acc + (p.votes?.taste || 0), 0);
+      const totalHate = posts.reduce((acc, p) => acc + (p.votes?.hate || 0), 0);
+
+      document.getElementById('statPostsCount').textContent = String(posts.length);
+      document.getElementById('statTotalTaste').textContent = String(totalTaste);
+      document.getElementById('statTotalHate').textContent = String(totalHate);
+    }
+
+    function renderCategories() {
+      const bar = document.getElementById('categoryBar');
+      const categories = getAllCategories();
+
+      bar.innerHTML = categories
+        .map((cat) => {
+          const isActive = cat === activeCategory;
+          const classes = isActive
+            ? 'bg-stone-900 text-white border-stone-900'
+            : 'bg-white text-stone-700 border-stone-300 hover:bg-stone-100';
+          return `
+            <button
+              type="button"
+              data-category="${escapeHtml(cat)}"
+              class="category-btn px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium border transition cursor-pointer ${classes}"
+            >
+              ${escapeHtml(cat)}
+            </button>
+          `;
+        })
+        .join('');
+
+      bar.querySelectorAll('.category-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeCategory = btn.dataset.category || 'Wszystkie';
+          renderAll();
+        });
+      });
+    }
+
+    function renderPostsGrid() {
+      const grid = document.getElementById('postsGrid');
+      const emptyState = document.getElementById('emptyState');
+      const resultsInfo = document.getElementById('resultsInfo');
+      const visiblePosts = getFilteredAndSortedPosts();
+
+      resultsInfo.textContent = `Wyświetlane wpisy: ${visiblePosts.length} z ${posts.length}`;
+
+      if (!visiblePosts.length) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      grid.innerHTML = visiblePosts
+        .map((post) => {
+          const taste = post.votes?.taste || 0;
+          const hate = post.votes?.hate || 0;
+          const myVote = userVotes[post.id];
+          const excerpt = stripHtml(post.html).slice(0, 155);
+          const firstImage = Array.isArray(post.images) && post.images.length > 0 ? post.images[0] : null;
+          const extraImagesCount = Array.isArray(post.images) && post.images.length > 1 ? post.images.length - 1 : 0;
+
+          const mediaHtml = firstImage
+            ? `
+              <div class="relative aspect-[16/10] bg-stone-100 overflow-hidden">
+                <img
+                  src="${escapeHtml(firstImage)}"
+                  alt="${escapeHtml(post.title)}"
+                  loading="lazy"
+                  onerror="this.onerror=null;this.src='${escapeHtml(fallbackImageUrl(post.title))}';"
+                  class="w-full h-full object-cover group-hover:scale-[1.02] transition duration-300"
+                />
+                <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-stone-950/75 text-amber-200 backdrop-blur-xs">
+                  Blogger • tymczasowe
+                </span>
+                ${
+                  extraImagesCount > 0
+                    ? `<span class="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-stone-950/75 text-white">+${extraImagesCount} foto</span>`
+                    : ''
+                }
+              </div>
+            `
+            : `
+              <div class="aspect-[16/10] bg-gradient-to-br from-stone-100 to-stone-200/70 flex flex-col items-center justify-center p-5 text-center border-b border-stone-200/60">
+                <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Przepis / wpis bez zdjęcia</span>
+                <span class="text-sm font-bold text-stone-700 mt-1 line-clamp-2">${escapeHtml(post.title)}</span>
+              </div>
+            `;
+
+          const tagsHtml = (post.categories || [])
+            .slice(0, 3)
+            .map(
+              (cat) =>
+                `<span class="px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[11px] font-medium">${escapeHtml(cat)}</span>`
+            )
+            .join('');
+
+          const tasteActive = myVote === 'taste'
+            ? 'bg-emerald-600 text-white border-emerald-600'
+            : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100';
+          const hateActive = myVote === 'hate'
+            ? 'bg-rose-600 text-white border-rose-600'
+            : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100';
+
+          return `
+            <article class="bg-white rounded-2xl border border-stone-200/90 shadow-xs hover:shadow-md transition flex flex-col justify-between overflow-hidden group">
+              <div>
+                <div class="cursor-pointer" data-open-post="${escapeHtml(post.id)}">
+                  ${mediaHtml}
+                  <div class="p-5 pb-3 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2 text-xs text-stone-500">
+                      <time datetime="${escapeHtml(post.published)}">${escapeHtml(formatDatePl(post.published))}</time>
+                      <div class="flex flex-wrap gap-1">${tagsHtml}</div>
+                    </div>
+                    <h3 class="text-lg font-bold text-stone-900 group-hover:text-emerald-800 transition leading-snug">
+                      ${escapeHtml(post.title)}
+                    </h3>
+                    <p class="text-sm text-stone-600 leading-relaxed line-clamp-3">
+                      ${escapeHtml(excerpt)}${excerpt.length >= 155 ? '…' : ''}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-5 pb-5 pt-2 space-y-3">
+                <div class="flex items-center justify-between gap-2 pt-2 border-t border-stone-100">
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      data-vote-post="${escapeHtml(post.id)}"
+                      data-vote-type="taste"
+                      class="vote-btn px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${tasteActive}"
+                    >
+                      Taste (${taste})
+                    </button>
+                    <button
+                      type="button"
+                      data-vote-post="${escapeHtml(post.id)}"
+                      data-vote-type="hate"
+                      class="vote-btn px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${hateActive}"
+                    >
+                      Hate (${hate})
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    data-open-post="${escapeHtml(post.id)}"
+                    class="text-xs font-semibold text-stone-700 hover:text-stone-950 underline underline-offset-2 cursor-pointer"
+                  >
+                    Czytaj
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+
+      grid.querySelectorAll('[data-open-post]').forEach((el) => {
+        el.addEventListener('click', () => openPostModal(el.dataset.openPost));
+      });
+
+      grid.querySelectorAll('.vote-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          voteOnPost(btn.dataset.votePost, btn.dataset.voteType);
+        });
+      });
+    }
+
+    function renderPostModalFooter(post) {
+      const footer = document.getElementById('modalFooter');
+      const taste = post.votes?.taste || 0;
+      const hate = post.votes?.hate || 0;
+      const myVote = userVotes[post.id];
+
+      const tasteActive = myVote === 'taste'
+        ? 'bg-emerald-600 text-white border-emerald-600'
+        : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100';
+      const hateActive = myVote === 'hate'
+        ? 'bg-rose-600 text-white border-rose-600'
+        : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100';
+
+      footer.innerHTML = `
+        <div class="flex items-center gap-2.5">
+          <button
+            type="button"
+            id="modalVoteTaste"
+            class="px-4 py-2 rounded-xl border text-sm font-bold transition cursor-pointer ${tasteActive}"
+          >
+            Taste (${taste})
+          </button>
+          <button
+            type="button"
+            id="modalVoteHate"
+            class="px-4 py-2 rounded-xl border text-sm font-bold transition cursor-pointer ${hateActive}"
+          >
+            Hate (${hate})
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="modalEditBtn"
+            class="px-3.5 py-2 rounded-xl bg-stone-100 text-stone-800 hover:bg-stone-200 text-xs sm:text-sm font-semibold border border-stone-300 transition cursor-pointer"
+          >
+            Edytuj wpis
+          </button>
+          <button
+            type="button"
+            id="modalDeleteBtn"
+            class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs sm:text-sm font-semibold border border-rose-200 transition cursor-pointer"
+          >
+            Usuń
+          </button>
+        </div>
+      `;
+
+      document.getElementById('modalVoteTaste').addEventListener('click', () => voteOnPost(post.id, 'taste'));
+      document.getElementById('modalVoteHate').addEventListener('click', () => voteOnPost(post.id, 'hate'));
+      document.getElementById('modalEditBtn').addEventListener('click', () => {
+        closePostModal();
+        openEditorModal(post.id);
+      });
+      document.getElementById('modalDeleteBtn').addEventListener('click', () => {
+        deletePost(post.id);
+        closePostModal();
+      });
+    }
+
+    function openPostModal(postId) {
+      const post = posts.find((p) => p.id === postId);
+      if (!post) return;
+
+      const modal = document.getElementById('postModal');
+      modal.dataset.currentPostId = post.id;
+
+      const catsText = (post.categories || []).join(', ');
+      document.getElementById('modalMeta').textContent =
+        `${formatDatePl(post.published)}${catsText ? ` • ${catsText}` : ''}`;
+      document.getElementById('modalTitle').textContent = post.title;
+
+      const gallery = document.getElementById('modalGallery');
+      const imgs = Array.isArray(post.images) ? post.images : [];
+      if (imgs.length > 0) {
+        gallery.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-lg">
+              Zdjęcia tymczasowe z Bloggera (${imgs.length}) — do podmiany na pliki w repozytorium GitHuba
+            </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ${imgs
+              .map(
+                (url, idx) => `
+                  <figure class="rounded-xl overflow-hidden border border-stone-200 bg-stone-100">
+                    <img
+                      src="${escapeHtml(url)}"
+                      alt="${escapeHtml(post.title)} — zdjęcie ${idx + 1}"
+                      onerror="this.onerror=null;this.src='${escapeHtml(fallbackImageUrl(post.title))}';"
+                      class="w-full h-56 object-cover"
+                    />
+                  </figure>
+                `
+              )
+              .join('')}
+          </div>
+        `;
+      } else {
+        gallery.innerHTML = '';
+      }
+
+      document.getElementById('modalContent').innerHTML = post.html || '';
+      renderPostModalFooter(post);
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePostModal() {
+      const modal = document.getElementById('postModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      delete modal.dataset.currentPostId;
+    }
+
+    function openEditorModal(postId = null) {
+      const modal = document.getElementById('editorModal');
+      const titleEl = document.getElementById('editorModalTitle');
+      const idInput = document.getElementById('editPostId');
+      const titleInput = document.getElementById('postTitleInput');
+      const dateInput = document.getElementById('postDateInput');
+      const catsInput = document.getElementById('postCategoriesInput');
+      const tasteInput = document.getElementById('postTasteInput');
+      const hateInput = document.getElementById('postHateInput');
+      const imagesInput = document.getElementById('postImagesInput');
+      const bodyInput = document.getElementById('postBodyInput');
+
+      if (postId) {
+        const post = posts.find((p) => p.id === postId);
+        if (!post) return;
+        titleEl.textContent = 'Edycja wpisu';
+        idInput.value = post.id;
+        titleInput.value = post.title || '';
+        dateInput.value = toDatetimeLocalValue(post.published);
+        catsInput.value = (post.categories || []).join(', ');
+        tasteInput.value = String(post.votes?.taste || 0);
+        hateInput.value = String(post.votes?.hate || 0);
+        imagesInput.value = (post.images || []).join('\n');
+        bodyInput.value = post.html || '';
+      } else {
+        titleEl.textContent = 'Nowy wpis';
+        idInput.value = '';
+        titleInput.value = '';
+        dateInput.value = toDatetimeLocalValue(new Date().toISOString());
+        catsInput.value = '';
+        tasteInput.value = '0';
+        hateInput.value = '0';
+        imagesInput.value = '';
+        bodyInput.value = '';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeEditorModal() {
+      const modal = document.getElementById('editorModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function deletePost(postId) {
+      posts = posts.filter((p) => p.id !== postId);
+      delete userVotes[postId];
+      if (!getAllCategories().includes(activeCategory)) {
+        activeCategory = 'Wszystkie';
+      }
+      saveState();
+      renderAll();
+      renderManagerList('Usunięto wpis.');
+    }
+
+    function openManagerModal(notice = '') {
+      const modal = document.getElementById('managerModal');
+      renderManagerList(notice);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeManagerModal() {
+      const modal = document.getElementById('managerModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderManagerList(notice = '') {
+      const noticeEl = document.getElementById('managerActionNotice');
+      noticeEl.textContent = notice;
+
+      const listEl = document.getElementById('managerPostsList');
+      listEl.innerHTML = posts
+        .map((post) => {
+          const taste = post.votes?.taste || 0;
+          const hate = post.votes?.hate || 0;
+          return `
+            <div class="p-4 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="min-w-0">
+                <div class="font-bold text-stone-900 truncate">${escapeHtml(post.title)}</div>
+                <div class="text-xs text-stone-500">
+                  ${escapeHtml(formatDatePl(post.published))} • zdjęć: ${(post.images || []).length}
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <label class="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                  Taste
+                  <input
+                    type="number"
+                    min="0"
+                    data-quick-vote-id="${escapeHtml(post.id)}"
+                    data-quick-vote-field="taste"
+                    value="${taste}"
+                    class="w-16 px-2 py-1 rounded-lg border border-emerald-300 bg-emerald-50/50 text-stone-900 text-xs font-bold"
+                  />
+                </label>
+                <label class="text-xs text-rose-700 font-semibold flex items-center gap-1">
+                  Hate
+                  <input
+                    type="number"
+                    min="0"
+                    data-quick-vote-id="${escapeHtml(post.id)}"
+                    data-quick-vote-field="hate"
+                    value="${hate}"
+                    class="w-16 px-2 py-1 rounded-lg border border-rose-300 bg-rose-50/50 text-stone-900 text-xs font-bold"
+                  />
+                </label>
+                <button
+                  type="button"
+                  data-mgr-edit="${escapeHtml(post.id)}"
+                  class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold border border-stone-300 transition cursor-pointer"
+                >
+                  Edytuj
+                </button>
+                <button
+                  type="button"
+                  data-mgr-delete="${escapeHtml(post.id)}"
+                  class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold border border-rose-200 transition cursor-pointer"
+                >
+                  Usuń
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+
+      listEl.querySelectorAll('[data-quick-vote-id]').forEach((input) => {
+        input.addEventListener('change', () => {
+          const id = input.dataset.quickVoteId;
+          const field = input.dataset.quickVoteField;
+          const target = posts.find((p) => p.id === id);
+          if (!target) return;
+          const numVal = Math.max(0, parseInt(input.value, 10) || 0);
+          input.value = String(numVal);
+          target.votes = target.votes || { taste: 0, hate: 0 };
+          target.votes[field] = numVal;
+          saveState();
+          renderStats();
+          renderPostsGrid();
+          noticeEl.textContent = `Zaktualizowano statystyki dla: "${target.title}".`;
+        });
+      });
+
+      listEl.querySelectorAll('[data-mgr-edit]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          closeManagerModal();
+          openEditorModal(btn.dataset.mgrEdit);
+        });
+      });
+
+      listEl.querySelectorAll('[data-mgr-delete]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          deletePost(btn.dataset.mgrDelete);
+        });
+      });
+    }
+
+    function copyJsonToClipboard() {
+      const jsonStr = JSON.stringify(posts, null, 2);
+      const tempTextarea = document.createElement('textarea');
+      tempTextarea.value = jsonStr;
+      tempTextarea.style.position = 'fixed';
+      tempTextarea.style.opacity = '0';
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
+
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (err) {
+        copied = false;
+      }
+      document.body.removeChild(tempTextarea);
+
+      const noticeEl = document.getElementById('managerActionNotice');
+      noticeEl.textContent = copied
+        ? 'Skopiowano JSON wpisów do schowka.'
+        : 'Nie udało się automatycznie skopiować — użyj przycisku „Pobierz posts.json”.';
+    }
+
+    function downloadJsonFile() {
+      const jsonStr = JSON.stringify(posts, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'posts.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      document.getElementById('managerActionNotice').textContent = 'Pobrano plik posts.json.';
+    }
+
+    function renderAll() {
+      renderStats();
+      renderCategories();
+      renderPostsGrid();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderAll();
+
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value || '';
+        renderPostsGrid();
+      });
+
+      document.getElementById('sortSelect').addEventListener('change', (e) => {
+        sortMode = e.target.value;
+        renderPostsGrid();
+      });
+
+      document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+        activeCategory = 'Wszystkie';
+        searchQuery = '';
+        document.getElementById('searchInput').value = '';
+        renderAll();
+      });
+
+      document.getElementById('resetDemoDataBtn').addEventListener('click', () => {
+        posts = structuredClone(INITIAL_POSTS);
+        userVotes = {};
+        activeCategory = 'Wszystkie';
+        searchQuery = '';
+        document.getElementById('searchInput').value = '';
+        saveState();
+        renderAll();
+      });
+
+      document.getElementById('openNewPostBtn').addEventListener('click', () => openEditorModal(null));
+      document.getElementById('managerAddPostBtn').addEventListener('click', () => {
+        closeManagerModal();
+        openEditorModal(null);
+      });
+
+      document.getElementById('openManagerBtn').addEventListener('click', () => openManagerModal());
+      document.getElementById('openManagerTopBtn').addEventListener('click', () => openManagerModal());
+
+      document.getElementById('closePostModalBtn').addEventListener('click', closePostModal);
+      document.getElementById('postModal').addEventListener('click', (e) => {
+        if (e.target.id === 'postModal') closePostModal();
+      });
+
+      document.getElementById('closeEditorModalBtn').addEventListener('click', closeEditorModal);
+      document.getElementById('cancelEditorBtn').addEventListener('click', closeEditorModal);
+      document.getElementById('editorModal').addEventListener('click', (e) => {
+        if (e.target.id === 'editorModal') closeEditorModal();
+      });
+
+      document.getElementById('closeManagerModalBtn').addEventListener('click', closeManagerModal);
+      document.getElementById('managerModal').addEventListener('click', (e) => {
+        if (e.target.id === 'managerModal') closeManagerModal();
+      });
+
+      document.getElementById('postForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const existingId = document.getElementById('editPostId').value;
+        const title = document.getElementById('postTitleInput').value.trim();
+        const dateLocal = document.getElementById('postDateInput').value;
+        const categories = document
+          .getElementById('postCategoriesInput')
+          .value.split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const taste = Math.max(0, parseInt(document.getElementById('postTasteInput').value, 10) || 0);
+        const hate = Math.max(0, parseInt(document.getElementById('postHateInput').value, 10) || 0);
+        const images = document
+          .getElementById('postImagesInput')
+          .value.split(/\r?\n/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+        let rawBody = document.getElementById('postBodyInput').value.trim();
+
+        if (!title || !rawBody) return;
+
+        // Jeśli użytkownik wpisał zwykły tekst bez tagów HTML, zamknij akapity w <p>
+        if (!/<[a-z][\s\S]*>/i.test(rawBody)) {
+          rawBody = rawBody
+            .split(/\n{2,}/)
+            .map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+            .join('');
+        }
+
+        const isoDate = dateLocal ? new Date(dateLocal).toISOString() : new Date().toISOString();
+
+        if (existingId) {
+          const idx = posts.findIndex((p) => p.id === existingId);
+          if (idx !== -1) {
+            posts[idx] = {
+              ...posts[idx],
+              title,
+              slug: slugify(title),
+              published: isoDate,
+              categories,
+              images,
+              votes: { taste, hate },
+              html: rawBody,
+            };
+          }
+        } else {
+          const newId = `post-${Date.now()}`;
+          posts.unshift({
+            id: newId,
+            slug: slugify(title),
+            title,
+            published: isoDate,
+            categories,
+            images,
+            votes: { taste, hate },
+            html: rawBody,
+          });
+        }
+
+        saveState();
+        renderAll();
+        closeEditorModal();
+      });
+
+      document.getElementById('copyJsonBtn').addEventListener('click', copyJsonToClipboard);
+      document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonFile);
+
+      document.getElementById('contactForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const name = form.elements.name.value.trim();
+        document.getElementById('contactStatus').textContent =
+          `Dziękujemy, ${name}! Wiadomość została odnotowana w podglądzie.`;
+        form.reset();
+      });
+    });
+  </script>
+</body>
+</html>
